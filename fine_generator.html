@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine Generator</title>
+    <link rel="stylesheet" type="text/css" href="fine_generator.css">
+</head>
+<body>
+    <h1>Fine Generator</h1>
+    <form id="fineForm">
+        <label for="rollNo">Roll Number:</label>
+        <input type="text" id="rollNo" name="rollNo" required><br>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="class">Class:</label>
+        <input type="text" id="class" name="class" required><br>
+
+        <label for="section">Section:</label>
+        <input type="text" id="section" name="section" required><br>
+
+        <label for="fineAmount">Fine Amount (integer):</label>
+        <input type="number" id="fineAmount" name="fineAmount" required><br>
+
+        <label for="slipColor">Slip Color:</label>
+        <select id="slipColor" name="slipColor" required>
+            <option value="blue">Blue</option>
+            <option value="yellow">Yellow</option>
+            <option value="red">Red</option>
+        </select><br>
+
+        <input type="submit" value="Issue Fine">
+    </form>
+
+    <div id="result"></div>
+
+    <h2>Fine History:</h2>
+    <ul id="fineHistory"></ul>
+
+    <script>
+        document.getElementById("fineForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            
+            const rollNo = document.getElementById("rollNo").value;
+            const name = document.getElementById("name").value;
+            const className = document.getElementById("class").value;
+            const section = document.getElementById("section").value;
+            const fineAmount = document.getElementById("fineAmount").value;
+            const slipColor = document.getElementById("slipColor").value;
+
+            let slipMessage = "";
+            if (slipColor === "blue") {
+                slipMessage = "Blue slip";
+            } else if (slipColor === "yellow") {
+                slipMessage = "Yellow slip";
+            } else if (slipColor === "red") {
+                slipMessage = "Red slip";
+            }
+
+            // Prepare the fine record
+            const fineRecord = `${rollNo}, ${name}, Class: ${className}, Section: ${section}, ${slipMessage}, Fine Amount: ${fineAmount}`;
+
+            // Send the fine record to a text file (fine_records.txt)
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "save_fine.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.send(`fineRecord=${fineRecord}`);
+
+            // Display a message with the student's name, class, section, slip color, and fine amount
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = `${slipMessage} issued to student ${name} (Roll Number: ${rollNo}). Class: ${className}, Section: ${section}. Fine Amount: ${fineAmount}`;
+
+            // Update the fine history
+            const fineHistory = document.getElementById("fineHistory");
+            const newFineItem = document.createElement("li");
+            newFineItem.textContent = `${slipMessage} issued to student ${name} (Roll Number: ${rollNo}). Class: ${className}, Section: ${section}. Fine Amount: ${fineAmount}`;
+            fineHistory.appendChild(newFineItem);
+        });
+    </script>
+</body>
+</html>
